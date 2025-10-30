@@ -66,7 +66,7 @@ public struct EvaluateParameters: Sendable {
 
 /// File types for ``StableDiffusionConfiguration/files``. Used by the presets to provide
 /// relative file paths for different types of files.
-enum FileKey {
+public enum FileKey {
     case unetConfig
     case unetWeights
     case textEncoderConfig
@@ -109,12 +109,23 @@ enum FileKey {
 /// Finally use ``Image`` to save it to a file or convert to a CGImage for display.
 public struct StableDiffusionConfiguration: Sendable {
     public let id: String
-    let files: [FileKey: String]
+    public let files: [FileKey: String]
     public let defaultParameters: @Sendable () -> EvaluateParameters
     let factory:
         @Sendable (HubApi, StableDiffusionConfiguration, LoadConfiguration) throws ->
             StableDiffusion
-
+/// Public initializer for custom model configurations
+    public init(
+        id: String,
+        files: [FileKey: String],
+        defaultParameters: @escaping @Sendable () -> EvaluateParameters,
+        factory: @escaping @Sendable (HubApi, StableDiffusionConfiguration, LoadConfiguration) throws -> StableDiffusion
+    ) {
+        self.id = id
+        self.files = files
+        self.defaultParameters = defaultParameters
+        self.factory = factory
+    }
     public func download(
         hub: HubApi = HubApi(), progressHandler: @escaping (Progress) -> Void = { _ in }
     ) async throws {
